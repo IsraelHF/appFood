@@ -3,15 +3,19 @@ import { CommonModule } from '@angular/common';
 import { RestaurantComponent } from './restaurant/restaurant.component';
 import { IonicModule } from '@ionic/angular';
 import { LoadingRestaurantComponent } from './loading-restaurant/loading-restaurant.component';
-
-
+import { EmptyScreenComponent } from './empty-screen/empty-screen.component';
 
 @NgModule({
-  declarations: [RestaurantComponent, LoadingRestaurantComponent],
-  imports: [
-    CommonModule, 
-    IonicModule
+  declarations: [
+    RestaurantComponent,
+    LoadingRestaurantComponent,
+    EmptyScreenComponent,
   ],
-  exports: [RestaurantComponent, LoadingRestaurantComponent]
+  imports: [CommonModule, IonicModule],
+  exports: [
+    RestaurantComponent,
+    LoadingRestaurantComponent,
+    EmptyScreenComponent,
+  ],
 })
-export class ComponentsModule { }
+export class ComponentsModule {}
