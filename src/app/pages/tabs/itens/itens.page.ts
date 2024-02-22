@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Preferences } from '@capacitor/preferences';
 import { NavController } from '@ionic/angular';
 
 @Component({
@@ -8,8 +9,6 @@ import { NavController } from '@ionic/angular';
   styleUrls: ['./itens.page.scss'],
 })
 export class ItensPage implements OnInit {
-  
-
   restaurants = [
     {
       uid: 'dh1',
@@ -102,11 +101,17 @@ export class ItensPage implements OnInit {
   ];
 
   data: any = {};
+  cartData: any = {};
+  storeData: any = {};
   itens: any[] = [];
   id: any;
   veg: boolean = false;
 
-  constructor(private route: ActivatedRoute, private navCtrl: NavController) {}
+  constructor(
+    private route: ActivatedRoute,
+    private navCtrl: NavController,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.route.paramMap.subscribe((paramMap) => {
@@ -120,11 +125,99 @@ export class ItensPage implements OnInit {
     this.getItens();
   }
 
-  getItens() {
+  async getItens() {
     this.data = {};
     let data: any = this.restaurants.filter((x) => x.uid === this.id);
     this.data = data[0];
-    this.itens = this. allItems;
+    this.itens = this.allItems.filter((x) => x.uid === this.id);
+    this.categories = this.categories.filter((x) => x.uid === this.id);
+    this.cartData = {};
+    this.storeData = {};
+    let cart: any = await this.getCart();
+    console.log(cart);
+    if (cart?.value) {
+      this.storeData = JSON.parse(cart.value);
+      if (
+        this.id == this.storeData.restaurant.uid &&
+        this.allItems.length > 0
+      ) {
+        this.allItems.forEach((element: any) => {
+          this.storeData.itens.forEach((ele) => {
+            if (element.id != ele.id) return;
+            element.quantity = ele.quantity;
+          });
+        });
+      }
+    }
+    this.cartData.totalItem = this.storeData.totalItem;
+    this.cartData.totalPrice = this.storeData.totalPrice;
+  }
+
+  async getCart() {
+    return Preferences.get({ key: 'cart' });
+  }
+
+  quantityPlus(item, index) {
+    try {
+      if (!this.itens[index].quantity || this.itens[index].quantity == 0) {
+        this.itens[index].quantity = 1;
+      } else {
+        this.itens[index].quantity += 1;
+      }
+      this.calculate();
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  quantityMinus(item, index) {
+    if (this.itens[index].quantity !== 0) {
+      this.itens[index].quantity -= 1;
+    } else {
+      this.itens[index].quantity = 0;
+    }
+    this.calculate();
+  }
+  calculate() {
+    this.cartData.itens = [];
+    let item = this.itens.filter((x) => x.quantity > 0);
+    this.cartData.itens = item;
+
+    this.cartData.totalPrice = 0;
+    this.cartData.totalItem = 0;
+    item.forEach((element) => {
+      this.cartData.totalItem += element.quantity;
+      this.cartData.totalPrice +=
+        parseFloat(element.price) * parseFloat(element.quantity);
+    });
+    this.cartData.totalPrice = parseFloat(this.cartData.totalPrice).toFixed(2);
+    if (this.cartData.totalItem == 0) {
+      this.cartData.totalPrice = 0;
+      this.cartData.totalItem = 0;
+    }
+  }
+
+  async saveToCart() {
+    try {
+      this.cartData.restaurant = {};
+      this.cartData.restaurant = this.data;
+      console.log(this.cartData);
+      await Preferences.set({
+        key: 'cart',
+        value: JSON.stringify(this.cartData)
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async viewCart() {
+    console.log(this.cartData);
+    if (this.cartData.itens && this.cartData.itens.length > 0) {
+      //console.log(this.cartData);
+      await this.saveToCart();
+      this.router.navigate([this.router.url + '/cart']);
+    }
   }
 
   getCuisine(cuisine) {
@@ -132,6 +225,11 @@ export class ItensPage implements OnInit {
   }
 
   vegOnly(event) {
-    console.log(event.detail.checked);
+    this.itens = [];
+    if (event.detail.checked == true) {
+      this.itens = this.allItems.filter((x) => x.veg === true);
+    } else {
+      this.itens = this.allItems;
+    }
   }
 }
