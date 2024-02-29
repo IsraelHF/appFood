@@ -6,8 +6,13 @@ import { ItensPage } from './itens.page';
 const routes: Routes = [
   {
     path: '',
-    component: ItensPage
-  }
+    component: ItensPage,
+  },
+  {
+    path: 'cart',
+    loadChildren: () =>
+      import('./../cart/cart.module').then((m) => m.CartPageModule), // /../ acha as pastas automatico
+  },
 ];
 
 @NgModule({
