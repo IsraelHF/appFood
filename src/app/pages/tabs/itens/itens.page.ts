@@ -15,7 +15,7 @@ export class ItensPage implements OnInit {
       cover: 'assets/imgs/img1.jpeg',
       name: 'Dom Henrique 1',
       short_name: 'domhenrique1',
-      cuisines: ['Almoço', 'Café', 'Hamburguer'],
+      cuisines: ['Almoço', ' Café', ' Hamburguer'],
       rating: 5,
       delivery_time: 25,
       distance: 2.5,
@@ -26,7 +26,7 @@ export class ItensPage implements OnInit {
       cover: 'assets/imgs/img2.jpeg',
       name: 'Dom Henrique 2',
       short_name: 'domhenrique2',
-      cuisines: ['Almoço', 'Café', 'Hamburguer'],
+      cuisines: ['Almoço', ' Café', ' Hamburguer'],
       rating: 5,
       delivery_time: 25,
       distance: 2.5,
@@ -37,7 +37,7 @@ export class ItensPage implements OnInit {
       cover: 'assets/imgs/img3.jpeg',
       name: 'Dom Henrique 3',
       short_name: 'domhenrique3',
-      cuisines: ['Almoço', 'Café', 'Hamburguer'],
+      cuisines: ['Almoço', ' Café', ' Hamburguer'],
       rating: 5,
       delivery_time: 25,
       distance: 2.5,
@@ -45,7 +45,20 @@ export class ItensPage implements OnInit {
     },
   ];
 
-  allItems = [
+  categories: any[] = [
+    {
+      id: 'e00',
+      name: 'Italiana',
+      uid: 'dh1',
+    },
+    {
+      id: 'e01',
+      name: 'Mexicana',
+      uid: 'dh1',
+    },
+  ];
+
+  allItens = [
     {
       category_id: 'e00',
       cover: 'assets/imgs/pizza.jpeg',
@@ -87,19 +100,6 @@ export class ItensPage implements OnInit {
     },
   ];
 
-  categories: any[] = [
-    {
-      id: 'e00',
-      name: 'Italiana',
-      uid: 'dh1',
-    },
-    {
-      id: 'e01',
-      name: 'Mexicana',
-      uid: 'dh1',
-    },
-  ];
-
   data: any = {};
   cartData: any = {};
   storeData: any = {};
@@ -129,19 +129,18 @@ export class ItensPage implements OnInit {
     this.data = {};
     let data: any = this.restaurants.filter((x) => x.uid === this.id);
     this.data = data[0];
-    this.itens = this.allItems.filter((x) => x.uid === this.id);
+    this.itens = this.allItens.filter((x) => x.uid === this.id);
     this.categories = this.categories.filter((x) => x.uid === this.id);
     this.cartData = {};
     this.storeData = {};
     let cart: any = await this.getCart();
-    console.log(cart);
     if (cart?.value) {
       this.storeData = JSON.parse(cart.value);
       if (
         this.id == this.storeData.restaurant.uid &&
-        this.allItems.length > 0
+        this.allItens.length > 0
       ) {
-        this.allItems.forEach((element: any) => {
+        this.allItens.forEach((element: any) => {
           this.storeData.itens.forEach((ele) => {
             if (element.id != ele.id) return;
             element.quantity = ele.quantity;
@@ -178,11 +177,12 @@ export class ItensPage implements OnInit {
     }
     this.calculate();
   }
+
   calculate() {
     this.cartData.itens = [];
     let item = this.itens.filter((x) => x.quantity > 0);
     this.cartData.itens = item;
-
+    console.log(this.cartData);
     this.cartData.totalPrice = 0;
     this.cartData.totalItem = 0;
     item.forEach((element) => {
@@ -201,10 +201,9 @@ export class ItensPage implements OnInit {
     try {
       this.cartData.restaurant = {};
       this.cartData.restaurant = this.data;
-      console.log(this.cartData);
       await Preferences.set({
         key: 'cart',
-        value: JSON.stringify(this.cartData)
+        value: JSON.stringify(this.cartData),
       });
     } catch (e) {
       console.log(e);
@@ -212,24 +211,22 @@ export class ItensPage implements OnInit {
   }
 
   async viewCart() {
-    console.log(this.cartData);
     if (this.cartData.itens && this.cartData.itens.length > 0) {
-      //console.log(this.cartData);
       await this.saveToCart();
       this.router.navigate([this.router.url + '/cart']);
     }
   }
 
   getCuisine(cuisine) {
-    return cuisine.join(', ');
+    return cuisine.join(',');
   }
 
   vegOnly(event) {
     this.itens = [];
     if (event.detail.checked == true) {
-      this.itens = this.allItems.filter((x) => x.veg === true);
+      this.itens = this.allItens.filter((x) => x.veg === true);
     } else {
-      this.itens = this.allItems;
+      this.itens = this.allItens;
     }
   }
 }

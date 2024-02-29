@@ -22,40 +22,37 @@ export class CartPage implements OnInit {
   }
 
   async getCartData() {
-    // carrega os dados la
     let data: any = await this.getCart();
     if (data?.value) {
-      this.model = await JSON.parse(data.value); //parse => quebra o JSON
+      this.model = await JSON.parse(data.value);
       console.log(this.model);
-      this.calculate();
     }
+    this.calculate();
   }
 
   async calculate() {
-    // ASYNC => só termina quando o await for concluido/ evita q o carrinho quebre. (Para info cruciais)
-    let item = this.model.items.filter((x) => x.quantity > 0);
+    let item = this.model.itens.filter((x) => x.quantity > 0);
     this.model.items = item;
-    this.model.totalPrice = 0; //preco total dos pedidos
+    this.model.totalPrice = 0;
     this.model.totalItem = 0;
     this.model.deliverycharge = 0;
-    this.model.grandTotal = 0; //preco total com a entrega
+    this.model.grandTotal = 0;
     item.forEach((element) => {
       this.model.totalItem += element.quantity;
       this.model.totalPrice +=
         parseFloat(element.price) * parseFloat(element.quantity);
     });
     this.model.deliverycharge = this.deliveryCharge;
-    this.model.totalPrice = parseFloat(this.model.totalPrice).toFixed(2); // pra ficar duas casas depois da virgula
+    this.model.totalPrice = parseFloat(this.model.totalPrice).toFixed(2);
     this.model.grandTotal = (
       parseFloat(this.model.totalPrice) + parseFloat(this.model.deliverycharge)
-    ).toFixed(2); //preco total dos pedidos mais a entrega
-
+    ).toFixed(2);
     if (this.model.totalItem == 0) {
       this.model.totalItem = 0;
       this.model.totalPrice = 0;
       this.model.grandTotal = 0;
-      await this.clearCart(); //limpa o carrinho
-      this.model = 0; //zera o carrinho
+      await this.clearCart();
+      this.model = 0;
     }
   }
 
@@ -63,11 +60,8 @@ export class CartPage implements OnInit {
     return Preferences.remove({ key: 'cart' });
   }
 
-  quantityPlus(index) {}
-
   quantityMinus(index) {}
-
+  quantityPlus(index) {}
   addAddress() {}
-
   changeAddress() {}
 }

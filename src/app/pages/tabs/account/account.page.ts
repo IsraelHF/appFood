@@ -6,10 +6,64 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./account.page.scss'],
 })
 export class AccountPage implements OnInit {
+  orders = [];
+  isLoading: boolean = false;
+  model: any = {
+    icon: 'fast-food-outline',
+    title: 'Nenhum pedido encontrado!',
+  };
 
-  constructor() { }
+  constructor() {}
 
   ngOnInit() {
+    this.orders = [
+      {
+        name: 'Dom Henrique',
+        location: 'Guarapuava, Paraná',
+        price: 60.0,
+        status: 'Entregue',
+        items: ['Pizza x2', 'Burguer x2'],
+        date: 'Fevereiro 28, 2024',
+      },
+      {
+        name: 'Dom Henrique',
+        location: 'São Paulo, São Paulo',
+        price: 35.0,
+        status: 'Entregue',
+        items: ['Pizza x1'],
+        date: 'Fevereiro 28, 2024',
+      },
+      {
+        name: 'Dom Henrique 2',
+        location: 'Guarapuava, Paraná',
+        price: 20.0,
+        status: 'Entregue',
+        items: ['Salada Especial'],
+        date: 'Fevereiro 28, 2024',
+      },
+      {
+        name: 'Dom Henrique 3',
+        location: 'Londrina, Paraná',
+        price: 300.0,
+        status: 'Entregue',
+        items: ['Pizza x8'],
+        date: 'Fevereiro 28, 2024',
+      },
+      {
+        name: 'Dom Henrique',
+        location: 'Guarapuava, Paraná',
+        price: 60.0,
+        status: 'Entregue',
+        items: ['Pizza x2', 'Burguer x2'],
+        date: 'Fevereiro 28, 2024',
+      },
+    ];
   }
 
+  async onLoadingAccount() {
+    this.isLoading = true;
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 2000);
+  }
 }
